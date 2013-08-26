@@ -35,8 +35,8 @@
 %%% ===========================================================================
 
 reserved_words() ->
-    after and andalso band begin bnot bor bsl bsr bxor case catch cond div end
-    fun if let not of or orelse query receive rem try when xor.
+    after begin case catch cond end fun if let of query receive try when
+    and andalso band bnot bor bsl bsr bxor div not or orelse rem xor.
 
 %%% ===========================================================================
 %%% 1.6 Character Set
@@ -74,6 +74,7 @@ number_examples() ->
     2.3e1.2. % bad
 
 number_with_dollar() ->
+    $\,  %bad
     $\b,
     $\d,
     $\e,
@@ -83,8 +84,8 @@ number_with_dollar() ->
     $\s,
     $\t,
     $\v,
-    $\a,
-    $\c,
+    $\a, % bad
+    $\c, % bad
     $\1,
     $\11,
     $\111,
@@ -258,6 +259,8 @@ f({A}, [H|T]) when H > 0, T == 0;
                    H < 0 ->
     ok;
 f(_X, _) ->
+    ok.
+f(A) when integer(A); is_float(A),not pid(A) ->
     ok.
 
 %%% ===========================================================================
@@ -555,7 +558,10 @@ just_atoms() ->
 %%% ===========================================================================
 
 f() ->
+    fun 'f '/0,
     fun func/0,
+    fun func /0,
+    fun func/ 0,
     fun mod:func/0,
     fun (A) when A > 0 -> A;
         (B) when B > 0 -> B
