@@ -23,7 +23,8 @@
 
 -module('test_tricky').
 -author('mats cronqvist').
--export([tricky0/0,tricky1/0,tricky2/0,tricky4/1]).
+-export([tricky0/0,tricky1/0,tricky2/0,tricky3/0,
+         tricky3/1,tricky4/0,tricky4/1]).
 
 tricky0() ->
   3.
@@ -40,6 +41,86 @@ tricky2() ->
            end,
   ok.
 
+-type general_type() :: any()   %% The top type, the set of all Erlang terms
+                      | none()  %% The bottom type, contains no terms
+                      | pid()
+                      | port()
+                      | reference()
+                      | []                    %% nil
+                      | float()
+                      | atom()
+                      | <<>>
+                      | <<_:M>>          %% M is a positive integer
+                      | <<_:_*N>>        %% N is a positive integer
+                      | <<_:M, _:_*N>>
+                      | fun()                  %% any function
+                      | fun((...) -> Type)     %% any arity, returning Type
+                      | fun(() -> Type)
+                      | fun((TList) -> Type)
+                      | integer()
+                      | list(Type)          %% Proper list ([]-terminated)
+                      | improper_list(Type1, Type2)
+                      | maybe_improper_list(Type1, Type2)
+                      | nonempty_list(Type)  %% Proper non-empty list
+                      | tuple()              %% stands for a tuple of any size
+                      | {}
+                      | {TList}
+                      | term()
+                      | binary()
+                      | bitstring()
+                      | boolean()
+                      | byte()
+                      | char()
+                      | number()
+                      | list()
+                      | maybe_improper_list()
+                      | nonempty_list()
+                      | string()
+                      | nonempty_string()
+                      | iodata()
+                      | iolist()
+                      | module()
+                      | mfa()
+                      | arity()
+                      | node()
+                      | timeout()
+                      | no_return().
+
+-type my_fun_type() :: fun()                  %% any function
+                     | fun((...) -> Type)     %% any arity, returning Type
+                     | fun(() -> Type)
+                     | fun((A) -> Type)
+                     | fun((A, B) -> {A,B}).
+
+-spec tricky3(list()) -> {general_type()}
+           ; (tuple()) -> {my_fun_type()}.
+
+
+tricky3() ->
+  case now() of
+    {signal, _What, _From, _To} ->
+      true;
+    {signal, _What, _To} ->
+      true;
+    _Else ->
+      false
+  end.
+
+tricky3(T) ->
+  ok, receive
+      after
+        T -> T
+      end.
+
+tricky4() -> ok.
+
+tricky4(X) when is_integer(X) ->
+  tricky4(case X of
+            A -> tricky4(case X of
+                           A -> A
+                         end)
+          end),
+  ok;
 tricky4(A) ->
     try A band (catch A)
     catch
