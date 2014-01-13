@@ -27,7 +27,16 @@
          tricky3/1,tricky4/0,tricky4/1]).
 
 tricky0() ->
-  3.
+  3+
+    3.2+
+    3.2e+2+
+    3,
+  erlang:now(a,
+      1+2,
+      1.0e-2
+      ,123,
+      12+
+        2).
 
 tricky1() ->
   catch tricky2().
